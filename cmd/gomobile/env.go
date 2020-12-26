@@ -134,6 +134,11 @@ func buildEnvInit() (cleanup func(), err error) {
 		}
 		if buildCache == "" {
 			removeAll(tmpdir)
+		} else {
+			// These have a file for each exported struct. If a struct is deleted in the code, nothing deletes it from
+			// these folders. So we wipe the folders just in case.
+			removeAll(tmpdir+"/java")
+			removeAll(tmpdir+"/javac-output")
 		}
 	}
 	if buildN {
