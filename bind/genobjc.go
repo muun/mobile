@@ -900,7 +900,19 @@ func (g *ObjcGen) genInterfaceH(obj *types.TypeName, t *types.Interface) {
 		g.genInterfaceInterface(obj, summary, false)
 		return
 	}
-	g.Printf("@protocol %s%s <NSObject>\n", g.namePrefix, obj.Name())
+
+	exts := []string{"NSObject"}
+	numM := t.NumMethods()
+	for _, other := range g.allIntf {
+		// Only extend interfaces with fewer methods to avoid circular references
+		if other.t.NumMethods() < numM && types.AssignableTo(t, other.t) {
+			n := other.obj.Name()
+			n = g.namePrefixOf(other.obj.Pkg()) + n
+			exts = append(exts, n)
+		}
+	}
+
+	g.Printf("@protocol %s%s <%s>\n", g.namePrefix, obj.Name(), strings.Join(exts, ", "))
 	for _, m := range makeIfaceSummary(t).callable {
 		if !g.isSigSupported(m.Type()) {
 			g.Printf("// skipped method %s.%s with unsupported parameter or return types\n\n", obj.Name(), m.Name())
