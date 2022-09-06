@@ -339,6 +339,9 @@ func goCmdAt(at string, subcmd string, srcs []string, env []string, args ...stri
 	if buildWork {
 		cmd.Args = append(cmd.Args, "-work")
 	}
+
+	cmd.Args = append(cmd.Args, "-buildvcs=false")
+
 	cmd.Args = append(cmd.Args, args...)
 	cmd.Args = append(cmd.Args, srcs...)
 	cmd.Env = append([]string{}, env...)
